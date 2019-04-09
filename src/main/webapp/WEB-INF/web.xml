@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app 	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+	                    http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+			version="3.1">
+			
+  <display-name>Archetype Created Web Application</display-name>
+  
+  <welcome-file-list>
+  	<welcome-file>welcome.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!-- Root Web Application Context -->
+  <context-param>
+  	<param-name>contextConfigLocation</param-name>
+  	<param-value>config/root-webApplicationContext.xml</param-value>
+  </context-param>
+  
+  <!--<listener>
+  	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>-->
+  
+  <servlet>
+  	<servlet-name>dispatcherServlet1</servlet-name>
+  	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  	
+  	<!-- Empty WebApplication Context -->
+  	<init-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value></param-value>
+  	</init-param>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>dispatcherServlet1</servlet-name>
+  	<url-pattern>/</url-pattern>
+  </servlet-mapping>
+  
+  <!-- REDIRECT all error to specified Url ( will catch by custom Controller)  -->
+ <error-page>
+    <location>/errors</location>
+  </error-page>
+
+	<listener>
+		<listener-class>com.chahar.spring.mvc.listeners.QuickerContextLoaderListener</listener-class>
+	</listener>
+  
+</web-app>

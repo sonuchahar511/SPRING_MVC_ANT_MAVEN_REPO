@@ -1,0 +1,190 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.chahar.spring</groupId>
+  <artifactId>SPRING_MVC_REPO_PROJECT</artifactId>
+ 
+  <packaging>war</packaging>
+  
+  <version>1.0-SNAPSHOT</version>
+  
+  <name>Spring MVC Repo Project</name>
+  <url>http://maven.apache.org</url>
+  
+  <properties>
+	  	<jstl.version>1.2</jstl.version>
+	  	
+	  	<spring.version>4.1.4.RELEASE</spring.version>
+	  	
+	  	<!-- <spring.version>5.1.0.RELEASE</spring.version> -->
+	  	<!-- jackson version is not compatible with spring 5.1.0.Release version -->
+	  	
+	  	<jcl-over-slf4j.version>1.7.5</jcl-over-slf4j.version>
+	  	<jackson.version>1.9.10</jackson.version>
+	  	
+	  	
+	  	<!-- file encoding for project resources files for 
+	  	 localized properties file , localized vm files -->
+	  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	  	<!-- 
+	  		mvn clean install 
+	  		[INFO]  maven-resources-plugin:2.6:resources (default-resources) @ springmvcproject 
+			[INFO] Using 'UTF-8' encoding to copy filtered resources.
+	  	 -->
+	  	 
+  </properties>
+  
+  <dependencies>
+  		
+  		<dependency>
+		      <groupId>junit</groupId>
+		      <artifactId>junit</artifactId>
+		      <version>3.8.1</version>
+		      <scope>test</scope>
+	    </dependency>
+  
+   		 <dependency>
+			<groupId>jstl</groupId>
+			<artifactId>jstl</artifactId>
+			<version>${jstl.version}</version>
+		</dependency>
+    
+    	<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+    	
+    	<!-- Spring Core -->
+		<!-- <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency> -->
+		
+		<!-- Log4j2 dependencies starts here -->
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-api</artifactId>
+		    <version>2.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>2.1</version>
+		</dependency>
+		<!-- Log4j2 dependencies ends here -->
+		
+		<!-- dependencies for common logging used in spring -->
+		<dependency>
+		   <groupId>commons-logging</groupId>
+		   <artifactId>commons-logging</artifactId>
+		   <version>1.2</version>
+		</dependency>
+		
+		<!-- bridge common logging to log4j2 -->
+		<dependency>
+		   <groupId>org.apache.logging.log4j</groupId>
+		   <artifactId>log4j-jcl</artifactId>
+		   <version>2.1</version>
+		</dependency>
+		
+		<!-- Jackson Java bean to json mapper -->
+		 <dependency>
+	        <groupId>com.fasterxml.jackson.core</groupId>
+	        <artifactId>jackson-databind</artifactId>
+	        <version>2.4.0</version>
+	    </dependency>
+	    
+	    <dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>2.4.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>2.4.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-json-provider</artifactId>
+        <version>2.4.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-jaxb-annotations</artifactId>
+        <version>2.4.0</version>
+    </dependency>    
+    
+    <!-- 
+    	Put Servlet/Jsp dependency for eclipse for development purpose only. 
+    	DONOT include these jars into war because Servlet/Jsp dependency is already present in tomcat lib directory.
+    	if included then conflict might occur, eventually may break war deployment.
+     -->
+    <dependency>
+	    <groupId>javax.servlet</groupId>
+	    <artifactId>javax.servlet-api</artifactId>
+	    <version>4.0.0</version>
+	    <scope>provided</scope>
+	</dependency>
+	
+	<dependency>
+	    <groupId>javax.servlet.jsp</groupId>
+	    <artifactId>javax.servlet.jsp-api</artifactId>
+	    <version>2.3.1</version>
+	    <scope>provided</scope>
+	</dependency>
+    
+    <!-- org/apache/commons/fileupload/FileItemFactory for MultipartResolver. -->
+    <dependency>
+	   <groupId>commons-fileupload</groupId>
+	   <artifactId>commons-fileupload</artifactId>
+	   <version>1.2.1</version> <!-- makesure correct version here -->
+	</dependency>
+
+	  <!-- Apache File Utility -->
+	  <dependency>
+		  <groupId>commons-io</groupId>
+		  <artifactId>commons-io</artifactId>
+		  <version>2.6</version>
+	  </dependency>
+
+  </dependencies>
+  
+  <build>
+  
+    <finalName>quickerweb</finalName>
+    
+    <plugins>
+    
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <version>2.2</version>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      
+    </plugins>
+    
+  </build>
+</project>

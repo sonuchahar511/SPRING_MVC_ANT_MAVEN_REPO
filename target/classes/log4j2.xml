@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    NOTE: shutdownHook="disable" Shutdown hook in log4j2 conflict with Spring shutdown.
+    Solution: Disable Log4j2 shutdown hook to let spring shutdown hook work
+-->
+
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config"
+			   monitorInterval="10" shutdownHook="disable">
+	<Properties>
+		<!-- properties comes here -->
+	</Properties>
+	
+	<Appenders>
+		<Console name="CONSOLE_APPENDER" target="SYSTEM_OUT">
+		    <!-- <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n}" /> -->
+		    <PatternLayout
+                    pattern="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} %highlight{${LOG_LEVEL_PATTERN:-%5p}}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue}  %style{%logger{36}}{cyan} : %msg%n" />
+		    <!-- "%highlight{%d{HH:mm:ss.SSS} %-5level %logger{36}.%M() @%L - %msg%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=white, DEBUG=green bold, TRACE=blue}" -->
+		</Console>
+	</Appenders>
+	
+	<Loggers>
+		<Root level="ALL">
+		    <AppenderRef ref="CONSOLE_APPENDER" />
+		</Root>
+		
+		<!-- <logger level="ALL" additivity="false" name="org.springframework">
+		    <AppenderRef ref="CONSOLE_APPENDER" />
+		</logger> -->
+		
+	</Loggers>
+</Configuration>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== -->
+<project name="SPRING_MVC_REPO_PROJECT" xmlns:ivy="antlib:org.apache.ivy.ant" default="package" basedir=".">
+
+  <property name="build.srcDir.0" value="src/main/java"/>
+  <property name="build.resourceDir.0" value="src/main/resources"/>
+  <property name="lib.dir" value="lib"/>
+
+  <property name="build.finalName" value="quickerweb"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="appserver.path" value="/home/sonu/TOMCAT_9"/>
+  <property name="webapp.name" value="${build.finalName}"/>
+  <property name="tomcat.manager.url" value="http://localhost:8080/manager"/>
+  <property name="tomcat.username" value="tomcat6"/>
+  <property name="tomcat.password" value="tomcat6"/>
+    
+  <path id="ivy.lib.path">
+    <fileset dir="ivyJar" includes="*.jar"/>
+  </path>
+  <path id="lib.path">
+    <fileset dir="lib" includes="*.jar"/>
+  </path>
+
+  <target name="resolve" description="--> retrieve dependencies with Ivy">
+    <ivy:retrieve/>
+  </target> 
+
+  <taskdef resource="org/apache/ivy/ant/antlib.xml"
+           uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+
+  <target name="compile" depends="resolve" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="1.8" 
+           verbose="true" 
+           fork="false" 
+           source="1.8">
+      <src>
+        <pathelement location="${build.srcDir.0}"/>
+      </src>
+      <classpath refid="lib.path"/>
+    </javac>
+    <copy todir="${build.outputDir}">
+      <fileset dir="${build.resourceDir.0}"/>
+    </copy>
+  </target>
+
+  <target name="package" depends="compile" description="Package the application">
+    <mkdir dir="${build.dir}/${build.finalName}/WEB-INF/lib"/>
+    <copy todir="${build.dir}/${build.finalName}/WEB-INF/lib" preservelastmodified = "true">
+          <fileset dir = "${lib.dir}"/>
+    </copy>
+    
+    <war destfile="${build.dir}/${build.finalName}.war" 
+         compress="true" 
+         webxml="src/main/webapp/WEB-INF/web.xml">
+      <lib dir="${build.dir}/${build.finalName}/WEB-INF/lib"/>
+      <classes dir="${build.outputDir}"/>
+      <fileset dir="src/main/webapp" 
+               excludes="WEB-INF/web.xml"/>
+    </war>
+  </target>
+
+  <target name="deploywar" depends="package" description="deploy war in tomcat">
+    <copy todir = "${appserver.path}/webapps" preservelastmodified = "true">
+       <fileset dir = "${build.dir}">
+          <include name = "*.war"/>
+       </fileset>
+    </copy>
+  </target>
+
+
+  <path id = "catalina-ant-classpath">
+      <fileset dir = "${appserver.path}/lib">
+        <include name = "*.jar"/>    
+      </fileset>
+      <pathelement location="${appserver.path}/bin/tomcat-juli.jar"/>
+      <pathelement location="${appserver.path}/bin/bootstrap.jar"/>
+      
+  </path>
+
+  <taskdef name="catalina-deploy" classname="org.apache.catalina.ant.DeployTask" classpathref="catalina-ant-classpath"/>
+  <taskdef name="catalina-list" classname="org.apache.catalina.ant.ListTask" classpathref="catalina-ant-classpath"/>
+  <taskdef name="catalina-reload" classname="org.apache.catalina.ant.ReloadTask" classpathref="catalina-ant-classpath"/>
+  <taskdef name="catalina-findleaks" classname="org.apache.catalina.ant.FindLeaksTask" classpathref="catalina-ant-classpath"/>
+  <taskdef name="catalina-resources" classname="org.apache.catalina.ant.ResourcesTask" classpathref="catalina-ant-classpath"/>
+  <taskdef name="catalina-start" classname="org.apache.catalina.ant.StartTask" classpathref="catalina-ant-classpath"/>
+  <taskdef name="catalina-stop" classname="org.apache.catalina.ant.StopTask" classpathref="catalina-ant-classpath"/>
+  <taskdef name="catalina-undeploy" classname="org.apache.catalina.ant.UndeployTask" classpathref="catalina-ant-classpath"/>
+
+  <target name = "stop-webapp">
+       <catalina-stop url="${tomcat.manager.url}"
+                         username="${tomcat.username}"
+                         password="${tomcat.password}"
+                         path="/${webapp.name}"
+                         failonerror="false"/>
+  </target>
+
+  <target name = "start-webapp">
+      <catalina-start url="${tomcat.manager.url}"
+                         username="${tomcat.username}"
+                         password="${tomcat.password}"
+                         path="/${webapp.name}"/>
+  </target>
+
+  <target name = "undeploy-webapp">
+      <catalina-undeploy url="${tomcat.manager.url}"
+                            username="${tomcat.username}"
+                            password="${tomcat.password}"
+                            path="/${webapp.name}"
+                            failonerror="false"/>
+  </target>
+
+  <target name = "deploy-webapp">
+      <catalina-deploy url="${tomcat.manager.url}"
+                          username="${tomcat.username}"
+                          password="${tomcat.password}"
+                          path="/${webapp.name}"
+                          war="file:${build.dir}/${build.finalName}.war" update="true"/>
+
+  </target>
+
+
+  <target name="tomcat-restart1">
+        <antcall target="tomcat-stop1" />
+        <antcall target="tomcat-start1" />
+    </target>
+
+    <target name="tomcat-start1">
+        <java classname="org.apache.catalina.startup.Bootstrap" fork="true">
+            <classpath path="${appserver.path}/bin/bootstrap.jar:${appserver.path}/bin/tomcat-juli.jar" />
+            <jvmarg value="-Dcatalina.home=${appserver.path}"/>
+            <!--If you are getting any OutOfMemoryError, remove the comments 
+            and enable jvm argument of the following line-->
+            <!--jvmarg value="-XX:MaxPermSize=256m"/-->
+        </java>
+    </target>
+
+    <target name="tomcat-stop1">
+        <java classname="org.apache.catalina.startup.Bootstrap" fork="true">
+            <classpath path="${appserver.path}/bin/bootstrap.jar:${appserver.path}/bin/tomcat-juli.jar" />
+            <jvmarg value="-Dcatalina.home=${appserver.path}"/>
+            <arg line="stop"/>
+        </java>
+    </target>
+
+  </project>

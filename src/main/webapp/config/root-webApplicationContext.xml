@@ -1,0 +1,132 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                        http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	                        http://www.springframework.org/schema/mvc    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+	                        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+   <context:component-scan base-package="com.chahar.spring" />
+   
+   <context:annotation-config />
+   
+   <mvc:annotation-driven />
+   
+   <context:property-placeholder location="classpath:app_configuration.properties" />
+   
+    <!--   Configure to plugin JSON as request and response in method handler -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="jsonMessageConverter"/>
+				<ref bean="xmlMessageConverter"/>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Configure bean to convert JSON to POJO and vice versa -->
+	<bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+	<bean id="xmlMessageConverter" class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter" />
+	
+   
+   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+      <property name="prefix" value="/WEB-INF/views/" />
+      <property name="suffix" value=".jsp" />
+   </bean>
+ 	
+	<mvc:interceptors>
+			<bean class="com.chahar.spring.mvc.interceptors.RequestTimeLoggerInterceptor" />
+			 
+			 <bean class="com.chahar.spring.mvc.interceptors.TimeBasedAccessCustomInterceptor">
+				<property name="openingTime" value="0"/>
+				<property name="closingTime" value="25"/>
+			 </bean>
+			 
+			 <!-- Locale interceptor used to detect locale
+				 	Without this interceptor, we won’t be able to change the user locale and send the response based on the new locale settings of the user.
+				  -->
+			 <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			 	<property name="paramName" value="language" />
+			 </bean>
+			 
+			 <!-- allow to change theme.
+			 	Without this interceptor, we won’t be able to change the user current theme and send the response based on the new theme of the user.
+			  -->
+			 <bean id="themeChangeInterceptor" class="org.springframework.web.servlet.theme.ThemeChangeInterceptor">
+				<property name="paramName" value="themeName" />
+			 </bean>
+			 
+	</mvc:interceptors>
+	
+	<mvc:resources mapping="/resources/**" location="/WEB-INF/_ui/" cache-period="31556926"/>
+	
+	<!-- read messages properties files -->
+	<!-- classpath:messages1_{locale}.properties -->
+	
+	<!-- 
+		1- messages1_{locale}.properties is fetched from following directory.
+			1- mvn tomcat7:run plugin
+				file location == target/classes/messages1_{locale}.properties
+			2- deployment war in standalone tomcat: 
+				file location == ${WEBAPP_DIR}/${PROJECT_DIR}/WEB-INF/classes/messages1_{locale}.properties  folder
+	 -->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:messages1" />
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="cacheSeconds" value="0" />
+	</bean>
+	
+	<!-- localeResolver: check current locale
+		1- org.springframework.web.servlet.i18n.SessionLocaleResolver
+			or 
+		2- org.springframework.web.servlet.i18n.CookieLocaleResolver
+		3- org.springframework.web.servlet.LocaleResolver.AcceptHeaderLocaleResolver: <default> choice if no localeResolver is present.
+			resolves user locale by checking the accept-language header in the client HTTP request
+	 -->
+	 <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+		<property name="defaultLocale" value="en" />
+	 </bean>
+	 
+	 <!--INFO: Changes inside Theme properties file is not reloadable , but css & other stuff all are reloadable.-->
+	 <bean id="themeSource" class="org.springframework.ui.context.support.ResourceBundleThemeSource">
+		<property name="basenamePrefix" value="app_" />
+	</bean>
+	
+	<!-- ThemeResolver detects current theme.
+		1- FixedThemeResolver
+		2- SessionThemeResolver
+		3- CookieThemeResolver 
+	-->
+	<bean id="themeResolver" class="org.springframework.web.servlet.theme.SessionThemeResolver">
+		<property name="defaultThemeName" value="theme1" />
+	</bean>
+	
+	<!--<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	    &lt;!&ndash; max file size in bytes &ndash;&gt;
+	    <property name="maxUploadSize" value="${file.upload.max.size.allowed}" />
+	</bean>-->
+	<bean id="multipartResolver" class="com.chahar.spring.mvc.resolvers.QuickerMultipartResolver">
+		<property name="maxUploadSize" value="${file.upload.max.size.allowed}" />
+	</bean>
+	
+	<!-- ExceptionHandling Resolver. -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<!-- <prop key="com.chahar.spring.mvc.exceptions.CustomException">error_page/customExceptionErrorPage</prop> -->
+				<prop key="java.lang.IllegalArgumentException">error_page/ilLegalExceptionErrorPage</prop>
+			</props>
+		</property>
+		
+		<!-- NOTE: 
+			1- SimpleMappingExceptionResolver.defaultErrorView is used then it will used to render error page
+			2- if not used , then then <error-page> in web.xml will be used.
+		-->
+		<!-- <property name="defaultErrorView" value="error_page/genericErrorPage" /> -->
+	</bean>
+	
+</beans>

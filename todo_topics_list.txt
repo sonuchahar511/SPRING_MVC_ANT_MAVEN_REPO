@@ -1,0 +1,37 @@
+Theme resolver - done - tested & working
+Locale resolver - done - tested & working
+Multipart resolver - done - file upload
+
+ExceptionHandlerResolver - done 
+error page - done
+
+@Controller - done
+@RequestMapping - done
+@RequestParam - done
+@PathVariable - done
+@RequestBody / @ResponseBody	-done
+@ModelAttribute - done - within method as method parameter, method level
+@SessionAttributes("pet")- todo - similar to @ModelAttribute
+
+MVC Interceptor - done
+redirect/forward - done
+
+Form Validator - done
+	<form:input path="lastName" />
+	<form:error path="lastName" />
+
+WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+
+Return JSON/XML as response from controller - RestController - done
+OXM- java to json/xml mapping - done
+
+Return JSP page - done
+
+RestTemplate - webservice - done & working
+1- Junit with mockito
+2- RestTemplate as client , WireMock as restserver
+
+=============================================================
+-apache poi jar
+-Generate pdf/ excel document
+-apache velocity - template used in sending email.
